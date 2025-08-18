@@ -1,0 +1,45 @@
+[package]
+name = "pokeys-thread"
+version = "0.3.0"
+edition = "2021"
+authors = ["Thomas Eichtinger <thomas@eichtinger.me>"]
+description = "Advanced threading architecture for multi-device PoKeys applications"
+license = "LGPL-2.1"
+repository = "https://github.com/pokeys-toolkit/thread"
+keywords = ["pokeys", "threading", "hardware", "automation", "multi-device"]
+categories = ["hardware-support", "concurrency"]
+readme = "README.md"
+
+[dependencies]
+pokeys-lib = { git = "https://github.com/pokeys-toolkit/core", version = "0.3.0" }
+thiserror = "1.0.40"
+log = "0.4.17"
+crossbeam-channel = "0.5.8"
+parking_lot = "0.12.1"
+serde = { version = "1.0.159", features = ["derive"] }
+dirs = "5.0.1"
+
+[dev-dependencies]
+env_logger = "0.10.0"
+tempfile = "3.5.0"
+serde_yaml = "0.9.21"
+
+[[example]]
+name = "simple_controller"
+path = "examples/simple_controller.rs"
+
+[[example]]
+name = "state_observer"
+path = "examples/state_observer.rs"
+
+[[example]]
+name = "device_operations"
+path = "examples/device_operations.rs"
+
+[[example]]
+name = "logging_example"
+path = "examples/logging_example.rs"
+
+[[example]]
+name = "comprehensive_example"
+path = "examples/comprehensive_example.rs"
