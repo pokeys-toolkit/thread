@@ -39,7 +39,7 @@
 //! ```
 
 use crate::error::Result;
-use pokeys_lib::{ServoConfig, USPIBridgeConfig};
+use pokeys_lib::{ServoConfig, USPIBridgeConfig, PinCapability};
 
 /// Device operations trait for performing device-specific operations.
 ///
@@ -278,6 +278,91 @@ pub trait DeviceOperations {
     ///
     /// Returns an error if the thread is not found or if the command send fails.
     fn uspibridge_command(&self, thread_id: u32, command: Vec<u8>) -> Result<Vec<u8>>;
+
+    /// Check if a pin supports a specific capability.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to check.
+    /// * `pin` - The pin number to check.
+    /// * `capability` - The capability to check for.
+    ///
+    /// # Returns
+    ///
+    /// True if the pin supports the capability, false otherwise.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found.
+    fn check_pin_capability(&self, thread_id: u32, pin: u8, capability: PinCapability) -> Result<bool>;
+
+    /// Get device model information.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to get model info from.
+    ///
+    /// # Returns
+    ///
+    /// Device model name if available.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found.
+    fn get_device_model(&self, thread_id: u32) -> Result<Option<String>>;
+
+    /// Validate pin configuration before operation.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to validate.
+    /// * `pin` - The pin number to validate.
+    /// * `operation` - Description of the operation being attempted.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the pin cannot perform the operation.
+    fn validate_pin_operation(&self, thread_id: u32, pin: u8, operation: &str) -> Result<()>;
+
+    /// Set multiple digital outputs in a single operation.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `pin_states` - Vector of (pin, state) tuples.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn set_digital_outputs_bulk(&self, thread_id: u32, pin_states: Vec<(u32, bool)>) -> Result<()>;
+
+    /// Set multiple PWM duty cycles in a single operation.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `channel_duties` - Vector of (channel, duty) tuples.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn set_pwm_duties_bulk(&self, thread_id: u32, channel_duties: Vec<(usize, u32)>) -> Result<()>;
+
+    /// Read multiple analog inputs in a single operation.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to read from.
+    /// * `pins` - Vector of pin numbers to read.
+    ///
+    /// # Returns
+    ///
+    /// Vector of analog values corresponding to the requested pins.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found.
+    fn read_analog_inputs_bulk(&self, thread_id: u32, pins: Vec<u32>) -> Result<Vec<u32>>;
 
     /// Get an encoder value.
     ///

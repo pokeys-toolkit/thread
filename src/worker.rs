@@ -593,6 +593,73 @@ impl DeviceWorkerImpl {
                                 debug!("uSPIBridge command: {} bytes", command.len());
                             }
                         }
+                        DeviceCommand::SetDigitalOutputsBulk { pin_states } => {
+                            if let Some(logger) = &logger {
+                                logger.debug(&format!("Bulk setting {} digital outputs", pin_states.len()));
+                            } else {
+                                debug!("Bulk setting {} digital outputs", pin_states.len());
+                            }
+
+                            for (pin, state) in pin_states {
+                                if let Err(e) = device.set_digital_output(pin, state) {
+                                    if let Some(logger) = &logger {
+                                        logger.error(&format!("Failed to set digital output pin {}: {}", pin, e));
+                                    } else {
+                                        error!("Failed to set digital output pin {}: {}", pin, e);
+                                    }
+                                } else {
+                                    shared_state.set_digital_output(pin, state);
+                                }
+                            }
+                        }
+                        DeviceCommand::SetPwmDutiesBulk { channel_duties } => {
+                            if let Some(logger) = &logger {
+                                logger.debug(&format!("Bulk setting {} PWM duties", channel_duties.len()));
+                            } else {
+                                debug!("Bulk setting {} PWM duties", channel_duties.len());
+                            }
+
+                            for (channel, duty) in channel_duties {
+                                let pin = match channel {
+                                    0 => 22, 1 => 21, 2 => 20, 3 => 19, 4 => 18, 5 => 17,
+                                    _ => continue,
+                                };
+
+                                if let Err(e) = device.set_pwm_duty_cycle_for_pin(pin, duty) {
+                                    if let Some(logger) = &logger {
+                                        logger.error(&format!("Failed to set PWM channel {}: {}", channel, e));
+                                    } else {
+                                        error!("Failed to set PWM channel {}: {}", channel, e);
+                                    }
+                                } else {
+                                    shared_state.set_pwm_duty_cycle(channel, duty);
+                                }
+                            }
+                        }
+                        DeviceCommand::ReadAnalogInputsBulk { pins } => {
+                            if let Some(logger) = &logger {
+                                logger.debug(&format!("Bulk reading {} analog inputs", pins.len()));
+                            } else {
+                                debug!("Bulk reading {} analog inputs", pins.len());
+                            }
+
+                            // Analog inputs are read during regular refresh cycle
+                            // This command just logs the request
+                        }
+                        DeviceCommand::CheckPinCapability { pin, capability } => {
+                            if let Some(logger) = &logger {
+                                logger.debug(&format!("Checking pin {} capability: {}", pin, capability));
+                            } else {
+                                debug!("Checking pin {} capability: {}", pin, capability);
+                            }
+                        }
+                        DeviceCommand::ValidatePinOperation { pin, operation } => {
+                            if let Some(logger) = &logger {
+                                logger.debug(&format!("Validating pin {} for operation: {}", pin, operation));
+                            } else {
+                                debug!("Validating pin {} for operation: {}", pin, operation);
+                            }
+                        }
                         DeviceCommand::ConfigureEncoder {
                             encoder_index,
                             pin_a,

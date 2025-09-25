@@ -33,7 +33,7 @@ use crate::logging::{Logger, ThreadLogger};
 use crate::observer::StateObserver;
 use crate::operations::DeviceOperations;
 use crate::state::{DeviceState, SharedDeviceState, ThreadStatus};
-use pokeys_lib::{ServoConfig, USPIBridgeConfig};
+use pokeys_lib::{ServoConfig, USPIBridgeConfig, PinCapability};
 use crate::worker::DeviceWorker;
 use log::{debug, error, info, LevelFilter};
 use pokeys_lib::{enumerate_network_devices, enumerate_usb_devices, NetworkDeviceSummary};
@@ -998,6 +998,100 @@ impl DeviceOperations for ThreadControllerImpl {
         // For now, return empty vector - full implementation would need response channel
         self.send_command(thread_id, DeviceCommand::USPIBridgeCommand { command })?;
         Ok(Vec::new())
+    }
+
+    fn check_pin_capability(&self, thread_id: u32, pin: u8, capability: PinCapability) -> Result<bool> {
+        let shared_state = self.get_shared_state(thread_id)?;
+        
+        // For now, return basic capability check based on common PoKeys device capabilities
+        // Full implementation would use device model database
+        match capability {
+            PinCapability::DigitalOutput => Ok(pin <= 55), // Most pins support digital output
+            PinCapability::DigitalInput => Ok(pin <= 55),
+            PinCapability::AnalogInput => Ok(pin <= 7), // Typically pins 0-7 for analog
+            PinCapability::PwmOutput => Ok((17..=22).contains(&pin)), // PWM pins 17-22
+            _ => Ok(false), // Conservative default
+        }
+    }
+
+    fn get_device_model(&self, thread_id: u32) -> Result<Option<String>> {
+        let shared_state = self.get_shared_state(thread_id)?;
+        
+        // Try to get device name from device_data.device_name field (byte array)
+        let device_name = shared_state.read(|state| {
+            let name_bytes = &state.device_data.device_name;
+            // Convert byte array to string, stopping at first null byte
+            let end = name_bytes.iter().position(|&b| b == 0).unwrap_or(name_bytes.len());
+            String::from_utf8_lossy(&name_bytes[..end]).to_string()
+        });
+        
+        if device_name.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(device_name))
+        }
+    }
+
+    fn validate_pin_operation(&self, thread_id: u32, pin: u8, operation: &str) -> Result<()> {
+        let capability = match operation {
+            "digital_output" => PinCapability::DigitalOutput,
+            "digital_input" => PinCapability::DigitalInput,
+            "analog_input" => PinCapability::AnalogInput,
+            "pwm" => PinCapability::PwmOutput,
+            "servo" => PinCapability::PwmOutput, // Servos use PWM pins
+            _ => return Err(ThreadError::validation_error(
+                "Unknown operation type",
+                operation,
+                Some("Use: digital_output, digital_input, analog_input, pwm, or servo")
+            )),
+        };
+
+        if !self.check_pin_capability(thread_id, pin, capability)? {
+            return Err(ThreadError::pin_capability_error(
+                pin,
+                operation,
+                Some(format!("Check device model for supported pins for {}", operation))
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn set_digital_outputs_bulk(&self, thread_id: u32, pin_states: Vec<(u32, bool)>) -> Result<()> {
+        self.log(
+            log::Level::Debug,
+            &format!("Bulk setting {} digital outputs on thread {}", pin_states.len(), thread_id),
+        );
+        self.send_command(thread_id, DeviceCommand::SetDigitalOutputsBulk { pin_states })
+    }
+
+    fn set_pwm_duties_bulk(&self, thread_id: u32, channel_duties: Vec<(usize, u32)>) -> Result<()> {
+        self.log(
+            log::Level::Debug,
+            &format!("Bulk setting {} PWM duties on thread {}", channel_duties.len(), thread_id),
+        );
+        self.send_command(thread_id, DeviceCommand::SetPwmDutiesBulk { channel_duties })
+    }
+
+    fn read_analog_inputs_bulk(&self, thread_id: u32, pins: Vec<u32>) -> Result<Vec<u32>> {
+        self.log(
+            log::Level::Debug,
+            &format!("Bulk reading {} analog inputs on thread {}", pins.len(), thread_id),
+        );
+        
+        // For now, read individual pins and collect results
+        let shared_state = self.get_shared_state(thread_id)?;
+        let mut results = Vec::new();
+        
+        for pin in pins {
+            if let Some(value) = shared_state.get_analog_input(pin) {
+                results.push(value);
+            } else {
+                results.push(0); // Default value for invalid pins
+            }
+        }
+        
+        Ok(results)
     }
 
     fn get_encoder_value(&self, thread_id: u32, encoder_index: u32) -> Result<i32> {

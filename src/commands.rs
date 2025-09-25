@@ -41,6 +41,16 @@ pub enum DeviceCommand {
     ConfigureUSPIBridge { config: USPIBridgeConfig },
     /// Send uSPIBridge command
     USPIBridgeCommand { command: Vec<u8> },
+    /// Bulk set digital outputs
+    SetDigitalOutputsBulk { pin_states: Vec<(u32, bool)> },
+    /// Bulk set PWM duty cycles
+    SetPwmDutiesBulk { channel_duties: Vec<(usize, u32)> },
+    /// Bulk read analog inputs
+    ReadAnalogInputsBulk { pins: Vec<u32> },
+    /// Check pin capability
+    CheckPinCapability { pin: u8, capability: String },
+    /// Validate pin operation
+    ValidatePinOperation { pin: u8, operation: String },
     /// Configure an encoder
     ConfigureEncoder {
         encoder_index: u32,
