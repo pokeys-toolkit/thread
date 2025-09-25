@@ -70,3 +70,5 @@ deny.json
 # website
 website/node_modules
 .git_old/
+
+.amazonq/
