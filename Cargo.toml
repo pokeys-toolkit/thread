@@ -2,7 +2,7 @@
 name = "pokeys-thread"
 version = "0.3.0"
 edition = "2021"
-authors = ["Thomas Eichtinger <thomas@eichtinger.me>"]
+authors = ["Marc Teichtahl <marc@teichtahl.com>"]
 description = "Advanced threading architecture for multi-device PoKeys applications"
 license = "LGPL-2.1"
 repository = "https://github.com/pokeys-toolkit/thread"
