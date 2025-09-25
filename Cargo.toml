@@ -1,6 +1,6 @@
 [package]
 name = "pokeys-thread"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 authors = ["Marc Teichtahl <marc@teichtahl.com>"]
 description = "Advanced threading architecture for multi-device PoKeys applications"
