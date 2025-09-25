@@ -1001,7 +1001,7 @@ impl DeviceOperations for ThreadControllerImpl {
     }
 
     fn check_pin_capability(&self, thread_id: u32, pin: u8, capability: PinCapability) -> Result<bool> {
-        let shared_state = self.get_shared_state(thread_id)?;
+        let _shared_state = self.get_shared_state(thread_id)?;
         
         // For now, return basic capability check based on common PoKeys device capabilities
         // Full implementation would use device model database

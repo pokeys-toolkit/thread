@@ -297,7 +297,7 @@ mod integration_tests {
         );
         
         // Test error message formatting
-        let error_message = format!("{}", pin_error);
+        let error_message = format!("{pin_error}");
         assert!(error_message.contains("Pin 99"));
         assert!(error_message.contains("pwm"));
         
@@ -316,7 +316,7 @@ mod integration_tests {
         );
         
         assert!(validation_error.is_recoverable());
-        assert!(format!("{}", validation_error).contains("Invalid servo configuration"));
+        assert!(format!("{validation_error}").contains("Invalid servo configuration"));
     }
     
     #[test]
