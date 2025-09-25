@@ -554,7 +554,7 @@ impl DeviceWorkerImpl {
 
                             // Scan I2C addresses 0x08 to 0x77
                             for addr in 0x08..=0x77 {
-                                if let Ok(_) = pokeys_lib::i2c_read_simple(&mut device, addr, 1) {
+                                if pokeys_lib::i2c_read_simple(&mut device, addr, 1).is_ok() {
                                     if let Some(logger) = &logger {
                                         logger.info(&format!("Found I2C device at address 0x{:02X}", addr));
                                     } else {

@@ -86,7 +86,7 @@ fn test_pwm_channel_to_pin_mapping() {
             5 => 17,
             _ => panic!("Invalid channel"),
         };
-        assert_eq!(pin, expected_pin, "Channel {} should map to pin {}", channel, expected_pin);
+        assert_eq!(pin, expected_pin, "Channel {channel} should map to pin {expected_pin}");
     }
 }
 
