@@ -205,11 +205,11 @@ impl DeviceState {
     /// The duty cycle of the PWM channel (0-4095 for 12-bit PWM),
     /// or None if the channel is invalid.
     pub fn get_pwm_duty_cycle(&self, channel: usize) -> Option<u32> {
-        if channel >= self.pwm.pwm_duty.len() {
+        if channel >= self.pwm.pwm_values.len() {
             return None;
         }
 
-        Some(self.pwm.pwm_duty[channel])
+        Some(self.pwm.pwm_values[channel])
     }
 }
 
@@ -419,9 +419,9 @@ impl SharedDeviceState {
 
         // Check for PWM changes
         for (i, (old_duty, new_duty)) in old_pwm
-            .pwm_duty
+            .pwm_values
             .iter()
-            .zip(new_pwm.pwm_duty.iter())
+            .zip(new_pwm.pwm_values.iter())
             .enumerate()
         {
             if old_duty != new_duty {
@@ -567,8 +567,8 @@ impl SharedDeviceState {
     /// * `duty` - The duty cycle to set (0-4095 for 12-bit PWM).
     pub fn set_pwm_duty_cycle(&self, channel: usize, duty: u32) {
         self.update(|state| {
-            if channel < state.pwm.pwm_duty.len() {
-                state.pwm.pwm_duty[channel] = duty;
+            if channel < state.pwm.pwm_values.len() {
+                state.pwm.pwm_values[channel] = duty;
                 self.notify(StateChangeType::PwmDutyCycle { channel, duty });
             }
         });
