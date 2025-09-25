@@ -148,7 +148,10 @@ impl ThreadError {
         match self {
             Self::PinCapabilityError { suggestion, .. } => suggestion.as_deref(),
             Self::HardwareConstraint { suggestion, .. } => Some(suggestion),
-            Self::ValidationError { recovery_suggestion, .. } => recovery_suggestion.as_deref(),
+            Self::ValidationError {
+                recovery_suggestion,
+                ..
+            } => recovery_suggestion.as_deref(),
             _ => None,
         }
     }
@@ -157,10 +160,10 @@ impl ThreadError {
     pub fn is_recoverable(&self) -> bool {
         matches!(
             self,
-            Self::PinCapabilityError { .. } |
-            Self::ValidationError { .. } |
-            Self::InvalidParameter(_) |
-            Self::ConfigurationError(_)
+            Self::PinCapabilityError { .. }
+                | Self::ValidationError { .. }
+                | Self::InvalidParameter(_)
+                | Self::ConfigurationError(_)
         )
     }
 }

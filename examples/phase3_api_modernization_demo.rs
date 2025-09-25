@@ -94,7 +94,7 @@ fn main() -> pokeys_thread::Result<()> {
 
         // Demonstrate pin capability checking
         info!("Checking pin capabilities:");
-        
+
         let test_pins = [5, 17, 25, 50];
         let capabilities = [
             PinCapability::AnalogInput,
@@ -107,8 +107,16 @@ fn main() -> pokeys_thread::Result<()> {
             for capability in &capabilities {
                 match controller.check_pin_capability(thread_id, pin, *capability) {
                     Ok(supported) => {
-                        info!("Pin {} {:?}: {}", pin, capability, 
-                              if supported { "✓ Supported" } else { "✗ Not supported" });
+                        info!(
+                            "Pin {} {:?}: {}",
+                            pin,
+                            capability,
+                            if supported {
+                                "✓ Supported"
+                            } else {
+                                "✗ Not supported"
+                            }
+                        );
                     }
                     Err(e) => {
                         info!("Failed to check pin {} capability: {}", pin, e);
@@ -126,7 +134,7 @@ fn main() -> pokeys_thread::Result<()> {
         let test_operations = [
             (17, "pwm"),
             (5, "analog_input"),
-            (99, "pwm"), // This should fail with helpful error
+            (99, "pwm"),               // This should fail with helpful error
             (17, "invalid_operation"), // This should fail with suggestion
         ];
 
@@ -137,7 +145,7 @@ fn main() -> pokeys_thread::Result<()> {
                 }
                 Err(e) => {
                     info!("✗ Validation failed for pin {} ({}): {}", pin, operation, e);
-                    
+
                     // Demonstrate enhanced error handling
                     if e.is_recoverable() {
                         if let Some(suggestion) = e.recovery_suggestion() {
@@ -157,7 +165,7 @@ fn main() -> pokeys_thread::Result<()> {
         let pin_error = ThreadError::pin_capability_error(
             99,
             "pwm",
-            Some("PWM is only available on pins 17-22".to_string())
+            Some("PWM is only available on pins 17-22".to_string()),
         );
         info!("Pin capability error: {}", pin_error);
         info!("  Recoverable: {}", pin_error.is_recoverable());
@@ -167,7 +175,7 @@ fn main() -> pokeys_thread::Result<()> {
 
         let hardware_error = ThreadError::hardware_constraint(
             "PWM frequency exceeds maximum",
-            "Reduce frequency to below 25MHz"
+            "Reduce frequency to below 25MHz",
         );
         info!("Hardware constraint error: {}", hardware_error);
         if let Some(suggestion) = hardware_error.recovery_suggestion() {
@@ -179,13 +187,14 @@ fn main() -> pokeys_thread::Result<()> {
 
         // Demonstrate bulk digital output operations
         info!("Setting multiple digital outputs in bulk:");
-        let pin_states = vec![
-            (1, true), (2, false), (3, true), (4, false), (5, true)
-        ];
-        
+        let pin_states = vec![(1, true), (2, false), (3, true), (4, false), (5, true)];
+
         match controller.set_digital_outputs_bulk(thread_id, pin_states.clone()) {
             Ok(()) => {
-                info!("✓ Bulk digital outputs set successfully ({} pins)", pin_states.len());
+                info!(
+                    "✓ Bulk digital outputs set successfully ({} pins)",
+                    pin_states.len()
+                );
                 for (pin, state) in &pin_states {
                     info!("  Pin {}: {}", pin, if *state { "HIGH" } else { "LOW" });
                 }
@@ -197,13 +206,14 @@ fn main() -> pokeys_thread::Result<()> {
 
         // Demonstrate bulk PWM operations
         info!("Setting multiple PWM duty cycles in bulk:");
-        let channel_duties = vec![
-            (0, 1000), (1, 2000), (2, 3000), (3, 4000)
-        ];
-        
+        let channel_duties = vec![(0, 1000), (1, 2000), (2, 3000), (3, 4000)];
+
         match controller.set_pwm_duties_bulk(thread_id, channel_duties.clone()) {
             Ok(()) => {
-                info!("✓ Bulk PWM duties set successfully ({} channels)", channel_duties.len());
+                info!(
+                    "✓ Bulk PWM duties set successfully ({} channels)",
+                    channel_duties.len()
+                );
                 for (channel, duty) in &channel_duties {
                     let percentage = (*duty as f32 / 4095.0) * 100.0;
                     info!("  Channel {}: {} ({:.1}%)", channel, duty, percentage);
@@ -217,7 +227,7 @@ fn main() -> pokeys_thread::Result<()> {
         // Demonstrate bulk analog input reading
         info!("Reading multiple analog inputs in bulk:");
         let analog_pins = vec![0, 1, 2, 3, 4, 5, 6, 7];
-        
+
         match controller.read_analog_inputs_bulk(thread_id, analog_pins.clone()) {
             Ok(values) => {
                 info!("✓ Bulk analog read successful ({} pins)", analog_pins.len());
@@ -255,20 +265,20 @@ fn main() -> pokeys_thread::Result<()> {
 
         // Performance comparison demonstration
         info!("Performance comparison:");
-        
+
         let start = std::time::Instant::now();
         // Individual operations (old way)
         for i in 0..10 {
             let _ = controller.set_digital_output(thread_id, i, i % 2 == 0);
         }
         let individual_time = start.elapsed();
-        
+
         let start = std::time::Instant::now();
         // Bulk operation (new way)
         let bulk_states: Vec<(u32, bool)> = (0..10).map(|i| (i, i % 2 == 0)).collect();
         let _ = controller.set_digital_outputs_bulk(thread_id, bulk_states);
         let bulk_time = start.elapsed();
-        
+
         info!("Individual operations: {:?}", individual_time);
         info!("Bulk operation: {:?}", bulk_time);
         if bulk_time < individual_time {
@@ -279,33 +289,33 @@ fn main() -> pokeys_thread::Result<()> {
     } else {
         info!("No devices found. Phase 3 demo will run without hardware.");
         info!("This demonstrates that the Phase 3 API is working correctly.");
-        
+
         // Demonstrate API without hardware
         info!("=== Phase 3 API Demonstration (No Hardware) ===");
-        
+
         info!("Enhanced Device Model Integration:");
         info!("- Pin capability validation with device-specific constraints");
         info!("- Device model information retrieval");
         info!("- Hardware-aware operation validation");
-        
+
         info!("Enhanced Error Handling:");
         info!("- Contextual error messages with recovery suggestions");
         info!("- Recoverable vs non-recoverable error classification");
         info!("- Hardware constraint violations with specific guidance");
-        
+
         info!("Performance Optimizations:");
         info!("- Bulk digital output operations (up to 50+ pins)");
         info!("- Bulk PWM duty cycle setting (all 6 channels)");
         info!("- Bulk analog input reading (all 8 channels)");
         info!("- Reduced communication overhead and improved throughput");
-        
+
         // Demonstrate error handling without hardware
         let demo_error = ThreadError::pin_capability_error(
             99,
             "pwm",
-            Some("Use pins 17-22 for PWM output".to_string())
+            Some("Use pins 17-22 for PWM output".to_string()),
         );
-        
+
         info!("Example enhanced error: {}", demo_error);
         info!("Recoverable: {}", demo_error.is_recoverable());
         if let Some(suggestion) = demo_error.recovery_suggestion() {

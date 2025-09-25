@@ -79,12 +79,20 @@ fn main() -> pokeys_thread::Result<()> {
         // Test each PWM channel
         for channel in 0..6 {
             let pin = match channel {
-                0 => 22, 1 => 21, 2 => 20, 3 => 19, 4 => 18, 5 => 17,
+                0 => 22,
+                1 => 21,
+                2 => 20,
+                3 => 19,
+                4 => 18,
+                5 => 17,
                 _ => continue,
             };
 
-            info!("Setting PWM channel {} (pin {}) to 25% duty cycle", channel, pin);
-            
+            info!(
+                "Setting PWM channel {} (pin {}) to 25% duty cycle",
+                channel, pin
+            );
+
             // Set PWM duty cycle to 25% (1024 out of 4095)
             match controller.set_pwm_duty_cycle(thread_id, channel, 1024) {
                 Ok(()) => {
@@ -102,12 +110,18 @@ fn main() -> pokeys_thread::Result<()> {
         info!("Testing percentage-based PWM control");
         for channel in 0..3 {
             let percentage = (channel + 1) as f32 * 25.0; // 25%, 50%, 75%
-            
-            info!("Setting PWM channel {} to {}% duty cycle", channel, percentage);
-            
+
+            info!(
+                "Setting PWM channel {} to {}% duty cycle",
+                channel, percentage
+            );
+
             match controller.set_pwm_duty_cycle_percent(thread_id, channel, percentage) {
                 Ok(()) => {
-                    info!("Successfully set PWM channel {} to {}%", channel, percentage);
+                    info!(
+                        "Successfully set PWM channel {} to {}%",
+                        channel, percentage
+                    );
                 }
                 Err(e) => {
                     info!("Failed to set PWM channel {} percentage: {}", channel, e);
@@ -119,7 +133,7 @@ fn main() -> pokeys_thread::Result<()> {
 
         // Demonstrate state monitoring
         info!("Creating state observer to monitor PWM changes");
-        
+
         match controller.create_observer(thread_id) {
             Ok(observer) => {
                 // Set a PWM value and wait for notification
@@ -147,7 +161,7 @@ fn main() -> pokeys_thread::Result<()> {
     } else {
         info!("No devices found. PWM demo will run without hardware.");
         info!("This demonstrates that the PWM API is working correctly.");
-        
+
         // Create a mock controller to show API usage
         info!("Demonstrating PWM API without hardware:");
         info!("- PWM channels 0-5 map to pins 22, 21, 20, 19, 18, 17");

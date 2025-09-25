@@ -140,8 +140,12 @@ fn main() -> pokeys_thread::Result<()> {
         // I2C write operation
         let test_address = 0x48; // Common I2C address for sensors
         let write_data = vec![0x01, 0x02, 0x03, 0x04];
-        
-        info!("Writing {} bytes to I2C address 0x{:02X}", write_data.len(), test_address);
+
+        info!(
+            "Writing {} bytes to I2C address 0x{:02X}",
+            write_data.len(),
+            test_address
+        );
         match controller.i2c_write(thread_id, test_address, write_data.clone()) {
             Ok(()) => {
                 info!("I2C write successful");
@@ -183,7 +187,10 @@ fn main() -> pokeys_thread::Result<()> {
             .with_default_brightness(8)
             .with_max_virtual_devices(2);
 
-        info!("Configuring uSPIBridge with {} devices", uspibridge_config.device_count);
+        info!(
+            "Configuring uSPIBridge with {} devices",
+            uspibridge_config.device_count
+        );
         match controller.configure_uspibridge(thread_id, uspibridge_config) {
             Ok(()) => {
                 info!("uSPIBridge configuration successful");
@@ -195,10 +202,16 @@ fn main() -> pokeys_thread::Result<()> {
 
         // Send uSPIBridge command
         let uspibridge_command = vec![0x11, 0x01, 0x48, 0x65, 0x6C, 0x6C, 0x6F]; // Example command
-        info!("Sending uSPIBridge command ({} bytes)", uspibridge_command.len());
+        info!(
+            "Sending uSPIBridge command ({} bytes)",
+            uspibridge_command.len()
+        );
         match controller.uspibridge_command(thread_id, uspibridge_command) {
             Ok(response) => {
-                info!("uSPIBridge command successful, received {} bytes", response.len());
+                info!(
+                    "uSPIBridge command successful, received {} bytes",
+                    response.len()
+                );
             }
             Err(e) => {
                 info!("uSPIBridge command failed: {}", e);
@@ -229,7 +242,7 @@ fn main() -> pokeys_thread::Result<()> {
     } else {
         info!("No devices found. Phase 2 demo will run without hardware.");
         info!("This demonstrates that the Phase 2 API is working correctly.");
-        
+
         // Demonstrate API without hardware
         info!("=== Phase 2 API Demonstration (No Hardware) ===");
         info!("Servo Control:");
@@ -237,13 +250,13 @@ fn main() -> pokeys_thread::Result<()> {
         info!("- 360° position servos: angle control 0-360°");
         info!("- 360° speed servos: speed control -100% to +100%");
         info!("- All servos use PWM pins 17-22");
-        
+
         info!("Enhanced I2C:");
         info!("- I2C write/read operations with automatic fragmentation");
         info!("- I2C bus scanning for device discovery");
         info!("- Combined write-read operations");
         info!("- Enhanced error handling and retry logic");
-        
+
         info!("uSPIBridge:");
         info!("- Custom pinout configuration");
         info!("- Segment mapping for display control");

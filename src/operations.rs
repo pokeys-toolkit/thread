@@ -39,7 +39,7 @@
 //! ```
 
 use crate::error::Result;
-use pokeys_lib::{ServoConfig, USPIBridgeConfig, PinCapability};
+use pokeys_lib::{PinCapability, ServoConfig, USPIBridgeConfig};
 
 /// Device operations trait for performing device-specific operations.
 ///
@@ -234,7 +234,13 @@ pub trait DeviceOperations {
     /// # Errors
     ///
     /// Returns an error if the thread is not found or if the command send fails.
-    fn i2c_write_read(&self, thread_id: u32, address: u8, write_data: Vec<u8>, read_length: u8) -> Result<Vec<u8>>;
+    fn i2c_write_read(
+        &self,
+        thread_id: u32,
+        address: u8,
+        write_data: Vec<u8>,
+        read_length: u8,
+    ) -> Result<Vec<u8>>;
 
     /// Scan for I2C devices on the bus.
     ///
@@ -294,7 +300,12 @@ pub trait DeviceOperations {
     /// # Errors
     ///
     /// Returns an error if the thread is not found.
-    fn check_pin_capability(&self, thread_id: u32, pin: u8, capability: PinCapability) -> Result<bool>;
+    fn check_pin_capability(
+        &self,
+        thread_id: u32,
+        pin: u8,
+        capability: PinCapability,
+    ) -> Result<bool>;
 
     /// Get device model information.
     ///

@@ -413,14 +413,20 @@ impl DeviceWorkerImpl {
                             // Note: This would typically be stored in a servo configuration map
                             // For now, we'll just log the configuration
                             if let Some(logger) = &logger {
-                                logger.info(&format!("Servo configured on pin {} with config: {:?}", pin, config));
+                                logger.info(&format!(
+                                    "Servo configured on pin {} with config: {:?}",
+                                    pin, config
+                                ));
                             } else {
                                 info!("Servo configured on pin {} with config: {:?}", pin, config);
                             }
                         }
                         DeviceCommand::SetServoAngle { pin, angle } => {
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("Setting servo angle on pin {} to {}", pin, angle));
+                                logger.debug(&format!(
+                                    "Setting servo angle on pin {} to {}",
+                                    pin, angle
+                                ));
                             } else {
                                 debug!("Setting servo angle on pin {} to {}", pin, angle);
                             }
@@ -428,7 +434,7 @@ impl DeviceWorkerImpl {
                             // For now, convert angle to PWM duty cycle (simplified implementation)
                             // In a full implementation, this would use stored servo configuration
                             let duty = ((angle / 180.0) * 4095.0) as u32;
-                            
+
                             if let Err(e) = device.set_pwm_duty_cycle_for_pin(pin, duty) {
                                 if let Some(logger) = &logger {
                                     logger.error(&format!("Failed to set servo angle: {}", e));
@@ -439,14 +445,17 @@ impl DeviceWorkerImpl {
                         }
                         DeviceCommand::SetServoSpeed { pin, speed } => {
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("Setting servo speed on pin {} to {}", pin, speed));
+                                logger.debug(&format!(
+                                    "Setting servo speed on pin {} to {}",
+                                    pin, speed
+                                ));
                             } else {
                                 debug!("Setting servo speed on pin {} to {}", pin, speed);
                             }
 
                             // Convert speed (-100 to 100) to PWM duty cycle
                             let duty = (((speed + 100.0) / 200.0) * 4095.0) as u32;
-                            
+
                             if let Err(e) = device.set_pwm_duty_cycle_for_pin(pin, duty) {
                                 if let Some(logger) = &logger {
                                     logger.error(&format!("Failed to set servo speed: {}", e));
@@ -464,7 +473,7 @@ impl DeviceWorkerImpl {
 
                             // Set to neutral position (1.5ms pulse = ~1500 duty cycle)
                             let duty = 1500;
-                            
+
                             if let Err(e) = device.set_pwm_duty_cycle_for_pin(pin, duty) {
                                 if let Some(logger) = &logger {
                                     logger.error(&format!("Failed to stop servo: {}", e));
@@ -480,7 +489,9 @@ impl DeviceWorkerImpl {
                                 debug!("I2C write to address 0x{:02X}", address);
                             }
 
-                            if let Err(e) = pokeys_lib::i2c_write_simple(&mut device, address, &data) {
+                            if let Err(e) =
+                                pokeys_lib::i2c_write_simple(&mut device, address, &data)
+                            {
                                 if let Some(logger) = &logger {
                                     logger.error(&format!("Failed to write I2C: {}", e));
                                 } else {
@@ -512,22 +523,30 @@ impl DeviceWorkerImpl {
                                 }
                             }
                         }
-                        DeviceCommand::I2cWriteRead { address, write_data, read_length } => {
+                        DeviceCommand::I2cWriteRead {
+                            address,
+                            write_data,
+                            read_length,
+                        } => {
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("I2C write-read to address 0x{:02X}", address));
+                                logger
+                                    .debug(&format!("I2C write-read to address 0x{:02X}", address));
                             } else {
                                 debug!("I2C write-read to address 0x{:02X}", address);
                             }
 
                             // Perform write then read operation
-                            if let Err(e) = pokeys_lib::i2c_write_simple(&mut device, address, &write_data) {
+                            if let Err(e) =
+                                pokeys_lib::i2c_write_simple(&mut device, address, &write_data)
+                            {
                                 if let Some(logger) = &logger {
                                     logger.error(&format!("Failed to write I2C: {}", e));
                                 } else {
                                     error!("Failed to write I2C: {}", e);
                                 }
                             } else {
-                                match pokeys_lib::i2c_read_simple(&mut device, address, read_length) {
+                                match pokeys_lib::i2c_read_simple(&mut device, address, read_length)
+                                {
                                     Ok(data) => {
                                         if let Some(logger) = &logger {
                                             logger.debug(&format!("I2C read {} bytes", data.len()));
@@ -556,7 +575,10 @@ impl DeviceWorkerImpl {
                             for addr in 0x08..=0x77 {
                                 if pokeys_lib::i2c_read_simple(&mut device, addr, 1).is_ok() {
                                     if let Some(logger) = &logger {
-                                        logger.info(&format!("Found I2C device at address 0x{:02X}", addr));
+                                        logger.info(&format!(
+                                            "Found I2C device at address 0x{:02X}",
+                                            addr
+                                        ));
                                     } else {
                                         info!("Found I2C device at address 0x{:02X}", addr);
                                     }
@@ -573,7 +595,10 @@ impl DeviceWorkerImpl {
                             // For now, just log the configuration
                             // Full implementation would configure the uSPIBridge hardware
                             if let Some(logger) = &logger {
-                                logger.info(&format!("uSPIBridge configured with {} devices", config.device_count));
+                                logger.info(&format!(
+                                    "uSPIBridge configured with {} devices",
+                                    config.device_count
+                                ));
                             } else {
                                 info!("uSPIBridge configured with {} devices", config.device_count);
                             }
@@ -588,14 +613,18 @@ impl DeviceWorkerImpl {
                             // For now, just log the command
                             // Full implementation would send the command via uSPIBridge
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("uSPIBridge command: {} bytes", command.len()));
+                                logger
+                                    .debug(&format!("uSPIBridge command: {} bytes", command.len()));
                             } else {
                                 debug!("uSPIBridge command: {} bytes", command.len());
                             }
                         }
                         DeviceCommand::SetDigitalOutputsBulk { pin_states } => {
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("Bulk setting {} digital outputs", pin_states.len()));
+                                logger.debug(&format!(
+                                    "Bulk setting {} digital outputs",
+                                    pin_states.len()
+                                ));
                             } else {
                                 debug!("Bulk setting {} digital outputs", pin_states.len());
                             }
@@ -603,7 +632,10 @@ impl DeviceWorkerImpl {
                             for (pin, state) in pin_states {
                                 if let Err(e) = device.set_digital_output(pin, state) {
                                     if let Some(logger) = &logger {
-                                        logger.error(&format!("Failed to set digital output pin {}: {}", pin, e));
+                                        logger.error(&format!(
+                                            "Failed to set digital output pin {}: {}",
+                                            pin, e
+                                        ));
                                     } else {
                                         error!("Failed to set digital output pin {}: {}", pin, e);
                                     }
@@ -614,20 +646,31 @@ impl DeviceWorkerImpl {
                         }
                         DeviceCommand::SetPwmDutiesBulk { channel_duties } => {
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("Bulk setting {} PWM duties", channel_duties.len()));
+                                logger.debug(&format!(
+                                    "Bulk setting {} PWM duties",
+                                    channel_duties.len()
+                                ));
                             } else {
                                 debug!("Bulk setting {} PWM duties", channel_duties.len());
                             }
 
                             for (channel, duty) in channel_duties {
                                 let pin = match channel {
-                                    0 => 22, 1 => 21, 2 => 20, 3 => 19, 4 => 18, 5 => 17,
+                                    0 => 22,
+                                    1 => 21,
+                                    2 => 20,
+                                    3 => 19,
+                                    4 => 18,
+                                    5 => 17,
                                     _ => continue,
                                 };
 
                                 if let Err(e) = device.set_pwm_duty_cycle_for_pin(pin, duty) {
                                     if let Some(logger) = &logger {
-                                        logger.error(&format!("Failed to set PWM channel {}: {}", channel, e));
+                                        logger.error(&format!(
+                                            "Failed to set PWM channel {}: {}",
+                                            channel, e
+                                        ));
                                     } else {
                                         error!("Failed to set PWM channel {}: {}", channel, e);
                                     }
@@ -648,14 +691,20 @@ impl DeviceWorkerImpl {
                         }
                         DeviceCommand::CheckPinCapability { pin, capability } => {
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("Checking pin {} capability: {}", pin, capability));
+                                logger.debug(&format!(
+                                    "Checking pin {} capability: {}",
+                                    pin, capability
+                                ));
                             } else {
                                 debug!("Checking pin {} capability: {}", pin, capability);
                             }
                         }
                         DeviceCommand::ValidatePinOperation { pin, operation } => {
                             if let Some(logger) = &logger {
-                                logger.debug(&format!("Validating pin {} for operation: {}", pin, operation));
+                                logger.debug(&format!(
+                                    "Validating pin {} for operation: {}",
+                                    pin, operation
+                                ));
                             } else {
                                 debug!("Validating pin {} for operation: {}", pin, operation);
                             }

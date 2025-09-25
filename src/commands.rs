@@ -34,7 +34,11 @@ pub enum DeviceCommand {
     /// I2C read operation
     I2cRead { address: u8, length: u8 },
     /// I2C write then read operation
-    I2cWriteRead { address: u8, write_data: Vec<u8>, read_length: u8 },
+    I2cWriteRead {
+        address: u8,
+        write_data: Vec<u8>,
+        read_length: u8,
+    },
     /// I2C bus scan
     I2cScan,
     /// Configure uSPIBridge
