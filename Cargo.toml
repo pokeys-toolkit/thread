@@ -11,7 +11,7 @@ categories = ["hardware-support", "concurrency"]
 readme = "README.md"
 
 [dependencies]
-pokeys-lib = { git = "https://github.com/pokeys-toolkit/core", version = "0.3.0" }
+pokeys-lib = "0.19.0"
 thiserror = "1.0.40"
 log = "0.4.17"
 crossbeam-channel = "0.5.8"
