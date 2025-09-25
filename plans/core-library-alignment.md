@@ -28,23 +28,23 @@ Align the PoKeys Thread library (v0.3.0) with the latest PoKeys Core library (v0
 
 ## Implementation Plan
 
-### Phase 1: Fix Compilation Errors (Priority: Critical)
+### Phase 1: Fix Compilation Errors (Priority: Critical) ✅ COMPLETED
 
-#### Task 1.1: Update PWM Data Structure Usage
+#### Task 1.1: Update PWM Data Structure Usage ✅
 - **File**: `src/state.rs`
 - **Changes**:
-  - Line 208: `self.pwm.pwm_duty.len()` → `self.pwm.pwm_values.len()`
-  - Line 212: `self.pwm.pwm_duty[channel]` → `self.pwm.pwm_values[channel]`
-  - Line 422: `.pwm_duty` → `.pwm_values`
-  - Line 424: `new_pwm.pwm_duty.iter()` → `new_pwm.pwm_values.iter()`
-  - Line 570: `state.pwm.pwm_duty.len()` → `state.pwm.pwm_values.len()`
-  - Line 571: `state.pwm.pwm_duty[channel]` → `state.pwm.pwm_values[channel]`
+  - ✅ Line 208: `self.pwm.pwm_duty.len()` → `self.pwm.pwm_values.len()`
+  - ✅ Line 212: `self.pwm.pwm_duty[channel]` → `self.pwm.pwm_values[channel]`
+  - ✅ Line 422: `.pwm_duty` → `.pwm_values`
+  - ✅ Line 424: `new_pwm.pwm_duty.iter()` → `new_pwm.pwm_values.iter()`
+  - ✅ Line 570: `state.pwm.pwm_duty.len()` → `state.pwm.pwm_values.len()`
+  - ✅ Line 571: `state.pwm.pwm_duty[channel]` → `state.pwm.pwm_values[channel]`
 
-#### Task 1.2: Update PWM Method Calls
+#### Task 1.2: Update PWM Method Calls ✅
 - **File**: `src/worker.rs`
 - **Changes**:
-  - Line 370: `device.set_pwm_duty_cycle(channel, duty)` → `device.set_pwm_duty_cycle_for_pin(pin, duty)`
-  - Note: May need to convert channel index to pin number (17-22)
+  - ✅ Line 370: `device.set_pwm_duty_cycle(channel, duty)` → `device.set_pwm_duty_cycle_for_pin(pin, duty)`
+  - ✅ Added channel to pin conversion (0→22, 1→21, 2→20, 3→19, 4→18, 5→17)
 
 ### Phase 2: Leverage New Core Features (Priority: Medium)
 
@@ -111,11 +111,13 @@ Align the PoKeys Thread library (v0.3.0) with the latest PoKeys Core library (v0
 
 ## Migration Timeline
 
-### Week 1: Critical Fixes
-- [ ] Fix PWM data structure usage (Task 1.1)
-- [ ] Fix PWM method calls (Task 1.2)
-- [ ] Ensure compilation success
-- [ ] Run basic tests
+### Week 1: Critical Fixes ✅ COMPLETED
+- [x] Fix PWM data structure usage (Task 1.1)
+- [x] Fix PWM method calls (Task 1.2)
+- [x] Ensure compilation success
+- [x] Run basic tests
+- [x] Add comprehensive PWM testing (8 test cases)
+- [x] Hardware validation with PoKeys57E device
 
 ### Week 2: Feature Integration
 - [ ] Implement servo control support (Task 2.1)

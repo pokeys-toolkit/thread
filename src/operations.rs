@@ -39,6 +39,7 @@
 //! ```
 
 use crate::error::Result;
+use pokeys_lib::{ServoConfig, USPIBridgeConfig};
 
 /// Device operations trait for performing device-specific operations.
 ///
@@ -135,6 +136,148 @@ pub trait DeviceOperations {
         channel: usize,
         duty_percent: f32,
     ) -> Result<()>;
+
+    /// Configure a servo on a PWM pin.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `pin` - The PWM pin to configure (17-22).
+    /// * `servo_config` - The servo configuration.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn configure_servo(&self, thread_id: u32, pin: u8, servo_config: ServoConfig) -> Result<()>;
+
+    /// Set servo angle (for 180° and 360° position servos).
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `pin` - The PWM pin (17-22).
+    /// * `angle` - The angle in degrees (0-180 for 180° servos, 0-360 for 360° position servos).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn set_servo_angle(&self, thread_id: u32, pin: u8, angle: f32) -> Result<()>;
+
+    /// Set servo speed (for 360° speed servos).
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `pin` - The PWM pin (17-22).
+    /// * `speed` - The speed (-100.0 to 100.0, where 0 is stop, positive is clockwise).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn set_servo_speed(&self, thread_id: u32, pin: u8, speed: f32) -> Result<()>;
+
+    /// Stop a servo (set to neutral position).
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `pin` - The PWM pin (17-22).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn stop_servo(&self, thread_id: u32, pin: u8) -> Result<()>;
+
+    /// Write data to an I2C device.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `address` - The I2C device address.
+    /// * `data` - The data to write.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn i2c_write(&self, thread_id: u32, address: u8, data: Vec<u8>) -> Result<()>;
+
+    /// Read data from an I2C device.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `address` - The I2C device address.
+    /// * `length` - The number of bytes to read.
+    ///
+    /// # Returns
+    ///
+    /// The data read from the device.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn i2c_read(&self, thread_id: u32, address: u8, length: u8) -> Result<Vec<u8>>;
+
+    /// Write then read from an I2C device (combined operation).
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `address` - The I2C device address.
+    /// * `write_data` - The data to write first.
+    /// * `read_length` - The number of bytes to read after writing.
+    ///
+    /// # Returns
+    ///
+    /// The data read from the device.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn i2c_write_read(&self, thread_id: u32, address: u8, write_data: Vec<u8>, read_length: u8) -> Result<Vec<u8>>;
+
+    /// Scan for I2C devices on the bus.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    ///
+    /// # Returns
+    ///
+    /// A vector of found I2C device addresses.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn i2c_scan(&self, thread_id: u32) -> Result<Vec<u8>>;
+
+    /// Configure uSPIBridge with custom pinout.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `config` - The uSPIBridge configuration.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn configure_uspibridge(&self, thread_id: u32, config: USPIBridgeConfig) -> Result<()>;
+
+    /// Send uSPIBridge command.
+    ///
+    /// # Parameters
+    ///
+    /// * `thread_id` - The ID of the thread to send the command to.
+    /// * `command` - The uSPIBridge command data.
+    ///
+    /// # Returns
+    ///
+    /// The response data from the uSPIBridge.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the thread is not found or if the command send fails.
+    fn uspibridge_command(&self, thread_id: u32, command: Vec<u8>) -> Result<Vec<u8>>;
 
     /// Get an encoder value.
     ///
