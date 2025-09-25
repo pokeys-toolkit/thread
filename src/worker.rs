@@ -367,7 +367,26 @@ impl DeviceWorkerImpl {
                                 debug!("Setting PWM channel {} duty to {}", channel, duty);
                             }
 
-                            if let Err(e) = device.set_pwm_duty_cycle(channel, duty) {
+                            // Convert channel (0-5) to pin number (17-22)
+                            // PWM channels map: 0->22, 1->21, 2->20, 3->19, 4->18, 5->17
+                            let pin = match channel {
+                                0 => 22,
+                                1 => 21,
+                                2 => 20,
+                                3 => 19,
+                                4 => 18,
+                                5 => 17,
+                                _ => {
+                                    if let Some(logger) = &logger {
+                                        logger.error(&format!("Invalid PWM channel: {}", channel));
+                                    } else {
+                                        error!("Invalid PWM channel: {}", channel);
+                                    }
+                                    continue;
+                                }
+                            };
+
+                            if let Err(e) = device.set_pwm_duty_cycle_for_pin(pin, duty) {
                                 if let Some(logger) = &logger {
                                     logger.error(&format!("Failed to set PWM duty cycle: {}", e));
                                 } else {
