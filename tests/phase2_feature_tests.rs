@@ -1,6 +1,5 @@
 use pokeys_thread::*;
 use pokeys_lib::{ServoConfig, ServoType, USPIBridgeConfig};
-use std::time::Duration;
 
 #[test]
 fn test_servo_config_creation() {
